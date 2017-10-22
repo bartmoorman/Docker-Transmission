@@ -18,7 +18,7 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > 
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 365C5CA1 && \
     apt-get update && \
     apt-get dist-upgrade --yes && \
-    apt-get install --yes --no-install-recommends tzdata locales transmission-daemon transmission-cli openvpn curl ca-certificates unrar unzip jq openssh-client && \
+    apt-get install --yes --no-install-recommends tzdata locales ca-certificates unzip openvpn transmission-daemon transmission-cli curl jq unrar openssh-client && \
     locale-gen en_US.UTF-8 && \
     apt-get autoremove --yes --purge && \
     apt-get clean && \
@@ -26,6 +26,7 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > 
 
 ADD https://www.privateinternetaccess.com/openvpn/openvpn.zip /etc/openvpn/
 #ADD https://www.privateinternetaccess.com/openvpn/openvpn-strong.zip /etc/openvpn/
+
 COPY openvpn/ /etc/openvpn/
 COPY transmission/ /etc/transmission/
 
