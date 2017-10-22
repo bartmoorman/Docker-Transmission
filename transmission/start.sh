@@ -8,5 +8,4 @@ exec $(which transmission-daemon) \
     --download-dir /data/complete \
     --no-portmap &
 
-/etc/transmission/opts.sh &
 /etc/transmission/port.sh &
