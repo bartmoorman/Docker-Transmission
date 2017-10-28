@@ -3,9 +3,10 @@
 docker run \
 --rm \
 --detach \
---init \
---privileged \
+--cap-add NET_ADMIN \
+--device /dev/net/tun \
 --name transmission-public \
+--hostname transmission-public \
 --network backend \
 --volume transmission-public-data:/data \
 --volume transmission-public-config:/config \
@@ -22,9 +23,10 @@ bmoorman/transmission
 docker run \
 --rm \
 --detach \
---init \
---privileged \
+--cap-add NET_ADMIN \
+--device /dev/net/tun \
 --name transmission-private \
+--hostname transmission-private \
 --network backend \
 --volume transmission-private-data:/data \
 --volume transmission-private-config:/config \
