@@ -1,3 +1,2 @@
 #!/bin/bash
-transmission-remote \
-    --exit
+$(which transmission-remote) --exit

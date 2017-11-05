@@ -3,6 +3,7 @@
 docker run \
 --rm \
 --detach \
+--init \
 --cap-add NET_ADMIN \
 --device /dev/net/tun \
 --name transmission-public \
@@ -23,6 +24,7 @@ bmoorman/transmission
 docker run \
 --rm \
 --detach \
+--init \
 --cap-add NET_ADMIN \
 --device /dev/net/tun \
 --name transmission-private \
