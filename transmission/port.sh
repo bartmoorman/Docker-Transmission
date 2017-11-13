@@ -27,7 +27,7 @@ for gateway in "${gateways[@]}"; do
                 port=$(jq .port <<< ${json})
             done
 
-            transmission-remote \
+            $(which transmission-remote) \
                 --port ${port}
 
             min=$((60 * 60 * ${TRANSMISSION_MIN_PORT_HRS}))
