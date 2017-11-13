@@ -2,7 +2,7 @@
 echo ${OPENVPN_USERNAME} > /etc/openvpn/credentials.txt
 echo ${OPENVPN_PASSWORD} >> /etc/openvpn/credentials.txt
 
-if [ -f /etc/openvpn/openvpn.zip || -f /etc/openvpn/openvpn-strong.zip ]; then
+if [ -f /etc/openvpn/openvpn.zip ] || [ -f /etc/openvpn/openvpn-strong.zip ]; then
     if [ -f /etc/openvpn/openvpn-strong.zip ]; then
       unzip -q -d /etc/openvpn /etc/openvpn/openvpn-strong.zip
     elif [ -f /etc/openvpn/openvpn.zip ]; then
