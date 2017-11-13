@@ -2,8 +2,13 @@
 echo ${OPENVPN_USERNAME} > /etc/openvpn/credentials.txt
 echo ${OPENVPN_PASSWORD} >> /etc/openvpn/credentials.txt
 
-if [ -f /etc/openvpn/openvpn.zip ]; then
-    unzip -q -d /etc/openvpn /etc/openvpn/openvpn.zip && rm --force /etc/openvpn/openvpn.zip
+if [ -f /etc/openvpn/openvpn.zip || -f /etc/openvpn/openvpn-strong.zip ]; then
+    if [ -f /etc/openvpn/openvpn-strong.zip ]; then
+      unzip -q -d /etc/openvpn /etc/openvpn/openvpn-strong.zip
+    elif [ -f /etc/openvpn/openvpn.zip ]; then
+      unzip -q -d /etc/openvpn /etc/openvpn/openvpn.zip
+    fi
+    rm --force /etc/openvpn/openvpn.zip /etc/openvpn/openvpn-strong.zip
     sed -i -r 's/^(auth-user-pass)$/\1 credentials.txt/' /etc/openvpn/*.ovpn
 fi
 
