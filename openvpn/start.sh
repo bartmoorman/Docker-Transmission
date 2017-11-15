@@ -2,8 +2,8 @@
 # https://www.privateinternetaccess.com/pages/client-support/#eighth
 gateways=('CA Toronto' 'CA Montreal' 'Netherlands' 'Sweden' 'Switzerland' 'France' 'Germany' 'Romania' 'Israel')
 
-echo ${OPENVPN_USERNAME} > credentials.txt
-echo ${OPENVPN_PASSWORD} >> credentials.txt
+echo "${OPENVPN_USERNAME}" > credentials.txt
+echo "${OPENVPN_PASSWORD}" >> credentials.txt
 
 if [ -f openvpn.zip ] || [ -f openvpn-strong.zip ]; then
     if [ -f openvpn-strong.zip ]; then
@@ -19,7 +19,7 @@ if [ -f openvpn.zip ] || [ -f openvpn-strong.zip ]; then
     *.ovpn
 fi
 
-if [ "${OPENVPN_GATEWAY}" == "Automatic" ]; then
+if [ "${OPENVPN_GATEWAY}" == 'Automatic' ]; then
     remotes=$(sed --regexp-extended --silent 's/^remote\s+(.*)\s+[0-9]+$/\1/p' "${gateways[@]/%/.ovpn}")
 
     while true; do
@@ -29,9 +29,9 @@ if [ "${OPENVPN_GATEWAY}" == "Automatic" ]; then
             export OPENVPN_GATEWAY=$(egrep --files-with-matches "^remote\s+${selected}\s+[0-9]+$" "${gateways[@]/%/.ovpn}" | cut --delimiter . --fields 1)
             export OPENVPN_CAN_FORWARD=true
             break
-        else
-            sleep $((sleep += 5))
         fi
+
+        sleep $((sleep += 5))
     done
 else
     for gateway in "${gateways[@]}"; do
@@ -52,7 +52,7 @@ exec $(which openvpn) \
     --down /etc/transmission/stop.sh \
     --down-pre \
     --setenv OPENVPN_LOCAL_NETWORK ${OPENVPN_LOCAL_NETWORK} \
-    --setenv OPENVPN_CAN_FORWARD ${OPENVPN_CAN_FORWARD} \
+    --setenv OPENVPN_CAN_FORWARD ${OPENVPN_CAN_FORWARD:-false} \
     --setenv TRANSMISSION_ALLOWED ${TRANSMISSION_ALLOWED} \
     --setenv TRANSMISSION_MIN_PORT_HRS ${TRANSMISSION_MIN_PORT_HRS} \
     --setenv TRANSMISSION_MAX_PORT_HRS ${TRANSMISSION_MAX_PORT_HRS} \
