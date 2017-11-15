@@ -8,8 +8,12 @@ if [ -f /etc/openvpn/openvpn.zip ] || [ -f /etc/openvpn/openvpn-strong.zip ]; th
     elif [ -f /etc/openvpn/openvpn.zip ]; then
       unzip -q -d /etc/openvpn /etc/openvpn/openvpn.zip
     fi
+
     rm --force /etc/openvpn/openvpn.zip /etc/openvpn/openvpn-strong.zip
-    sed -i -r 's/^(auth-user-pass)$/\1 credentials.txt/' /etc/openvpn/*.ovpn
+
+    sed --in-place --regexp-extended \
+    --expression 's/^(auth-user-pass)$/\1 credentials.txt/' \
+    /etc/openvpn/*.ovpn
 fi
 
 exec $(which openvpn) \
