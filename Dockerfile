@@ -2,13 +2,15 @@ FROM bmoorman/ubuntu
 
 ENV OPENVPN_USERNAME="**username**" \
     OPENVPN_PASSWORD="**password**" \
-    OPENVPN_GATEWAY="Netherlands" \
+    OPENVPN_GATEWAY="Automatic" \
     OPENVPN_LOCAL_NETWORK="192.168.0.0/16" \
     TRANSMISSION_ALLOWED="192.168.*.*,172.17.*.*" \
     TRANSMISSION_MIN_PORT_HRS="4" \
     TRANSMISSION_MAX_PORT_HRS="8"
 
 ARG DEBIAN_FRONTEND="noninteractive"
+
+WORKDIR /etc/openvpn
 
 RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > /etc/apt/sources.list.d/transmission.list \
  && echo 'deb-src http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' >> /etc/apt/sources.list.d/transmission.list \
@@ -23,6 +25,9 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > 
     transmission-daemon \
     unrar \
     unzip \
+    wget \
+ && wget --quiet --directory-prefix /tmp "http://ftp.debian.org/debian/pool/main/n/netselect/netselect_0.3.ds1-28+b1_amd64.deb" \
+ && dpkg -i /tmp/netselect_*_amd64.deb \
  && apt-get autoremove --yes --purge \
  && apt-get clean \
  && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -33,7 +38,7 @@ ADD https://www.privateinternetaccess.com/openvpn/openvpn.zip /etc/openvpn/
 COPY openvpn/ /etc/openvpn/
 COPY transmission/ /etc/transmission/
 
-VOLUME /data /config
+VOLUME /config /data
 
 EXPOSE 9091
 
