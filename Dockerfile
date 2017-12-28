@@ -18,6 +18,7 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > 
  && apt-get update \
  && apt-get install --yes --no-install-recommends \
     curl \
+    git \
     jq \
     openssh-client \
     openvpn \
@@ -26,6 +27,12 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > 
     unrar \
     unzip \
     wget \
+ && git clone https://github.com/diesys/transmission-web-soft-theme.git /opt/transmission-web-soft-theme \
+ && cp --recursive /opt/transmission-web-soft-theme/web /usr/share/transmission \
+ && sed --in-place --regexp-extended \
+    --expression '/endif/a\\t\t<link href="./style/transmission/soft-theme.min.css" type="text/css" rel="stylesheet" />' \
+    --expression '/endif/a\\t\t<link href="./style/transmission/soft-dark-theme.min.css" type="text/css" rel="stylesheet" />' \
+    /usr/share/transmission/web/index.html \
  && wget --quiet --directory-prefix /tmp "http://ftp.debian.org/debian/pool/main/n/netselect/netselect_0.3.ds1-28+b1_amd64.deb" \
  && dpkg --install /tmp/netselect_*_amd64.deb \
  && apt-get autoremove --yes --purge \
