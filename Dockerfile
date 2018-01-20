@@ -43,3 +43,5 @@ VOLUME /config /data
 EXPOSE 9091
 
 CMD ["/etc/openvpn/start.sh"]
+
+HEALTHCHECK --interval=60s --timeout=5s CMD curl --silent --location --fail http://localhost:9091/ > /dev/null || exit 1
