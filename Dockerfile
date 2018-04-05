@@ -1,4 +1,4 @@
-FROM bmoorman/ubuntu
+FROM bmoorman/ubuntu:xenial
 
 ENV OPENVPN_USERNAME="**username**" \
     OPENVPN_PASSWORD="**password**" \
