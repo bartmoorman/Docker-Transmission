@@ -1,6 +1,6 @@
 #!/bin/bash
 # https://www.privateinternetaccess.com/pages/client-support/#eighth
-gateways=('CA Toronto' 'CA Montreal' 'Netherlands' 'Sweden' 'Switzerland' 'France' 'Germany' 'Romania' 'Israel')
+gateways=('CA Toronto' 'CA Montreal' 'CA Vancouver' 'Czech Republic' 'DE Berlin' 'DE Frankfurt' 'France' 'Israel' 'Romania' 'Spain' 'Switzerland' 'Sweden')
 
 echo "${OPENVPN_USERNAME}" > credentials.txt
 echo "${OPENVPN_PASSWORD}" >> credentials.txt
