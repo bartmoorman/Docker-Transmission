@@ -4,6 +4,7 @@ ENV OPENVPN_USERNAME="**username**" \
     OPENVPN_PASSWORD="**password**" \
     OPENVPN_GATEWAY="Automatic" \
     OPENVPN_LOCAL_NETWORK="192.168.0.0/16" \
+    TRANSMISSION_PORT="9091" \
     TRANSMISSION_ALLOWED="192.168.*.*,172.17.*.*" \
     TRANSMISSION_MIN_PORT_HRS="4" \
     TRANSMISSION_MAX_PORT_HRS="8"
@@ -40,8 +41,8 @@ COPY transmission/ /etc/transmission/
 
 VOLUME /config /data
 
-EXPOSE 9091
+EXPOSE ${TRANSMISSION_PORT}
 
 CMD ["/etc/openvpn/start.sh"]
 
-HEALTHCHECK --interval=60s --timeout=5s CMD curl --silent --location --fail http://localhost:9091/ > /dev/null || exit 1
+HEALTHCHECK --interval=60s --timeout=5s CMD curl --head --insecure --silent --show-error --fail "http://localhost:${TRANSMISSION_PORT}/" || exit 1
