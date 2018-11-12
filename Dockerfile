@@ -1,4 +1,4 @@
-FROM bmoorman/ubuntu:xenial
+FROM bmoorman/ubuntu:bionic
 
 ENV OPENVPN_USERNAME="**username**" \
     OPENVPN_PASSWORD="**password**" \
@@ -13,8 +13,8 @@ ARG DEBIAN_FRONTEND="noninteractive"
 
 WORKDIR /etc/openvpn
 
-RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' > /etc/apt/sources.list.d/transmission.list \
- && echo 'deb-src http://ppa.launchpad.net/transmissionbt/ppa/ubuntu xenial main' >> /etc/apt/sources.list.d/transmission.list \
+RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' > /etc/apt/sources.list.d/transmission.list \
+ && echo 'deb-src http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' >> /etc/apt/sources.list.d/transmission.list \
  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 365C5CA1 \
  && apt-get update \
  && apt-get install --yes --no-install-recommends \
