@@ -15,7 +15,7 @@ WORKDIR /etc/openvpn
 
 RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' > /etc/apt/sources.list.d/transmission.list \
  && echo 'deb-src http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' >> /etc/apt/sources.list.d/transmission.list \
- && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 365C5CA1 \
+ && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 976B5901365C5CA1 \
  && apt-get update \
  && apt-get install --yes --no-install-recommends \
     curl \
