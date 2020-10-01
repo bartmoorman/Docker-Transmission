@@ -1,5 +1,7 @@
 FROM bmoorman/ubuntu:bionic
 
+ARG DEBIAN_FRONTEND="noninteractive"
+
 ENV OPENVPN_USERNAME="**username**" \
     OPENVPN_PASSWORD="**password**" \
     OPENVPN_GATEWAY="Automatic" \
@@ -8,8 +10,6 @@ ENV OPENVPN_USERNAME="**username**" \
     TRANSMISSION_ALLOWED="192.168.*.*,172.17.*.*" \
     TRANSMISSION_MIN_PORT_HRS="4" \
     TRANSMISSION_MAX_PORT_HRS="8"
-
-ARG DEBIAN_FRONTEND="noninteractive"
 
 WORKDIR /etc/openvpn
 

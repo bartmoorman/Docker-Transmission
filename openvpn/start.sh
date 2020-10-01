@@ -1,15 +1,18 @@
 #!/bin/bash
 # https://www.privateinternetaccess.com/pages/client-support/#eighth
-gateways=('CA Toronto' 'CA Montreal' 'CA Vancouver' 'Czech Republic' 'DE Berlin' 'DE Frankfurt' 'France' 'Israel' 'Romania' 'Spain' 'Switzerland' 'Sweden')
+# Temporarily remove Canada
+# https://www.privateinternetaccess.com/helpdesk/news/posts/march-31-2020-port-forwarding-issues
+# gateways=('CA Toronto' 'CA Montreal' 'CA Vancouver' 'DE Berlin' 'DE Frankfurt' 'France' 'Czech Republic' 'Spain' 'Romania' 'Israel')
+gateways=('DE Berlin' 'DE Frankfurt' 'France' 'Czech Republic' 'Spain' 'Romania' 'Israel')
 
 echo "${OPENVPN_USERNAME}" > credentials.txt
 echo "${OPENVPN_PASSWORD}" >> credentials.txt
 
-if [ -f openvpn.zip ] || [ -f openvpn-strong.zip ]; then
+if [ -f openvpn.zip -o -f openvpn-strong.zip ]; then
     if [ -f openvpn-strong.zip ]; then
-      unzip -q openvpn-strong.zip
+        unzip -q openvpn-strong.zip
     elif [ -f openvpn.zip ]; then
-      unzip -q openvpn.zip
+        unzip -q openvpn.zip
     fi
 
     rm --force openvpn.zip openvpn-strong.zip
