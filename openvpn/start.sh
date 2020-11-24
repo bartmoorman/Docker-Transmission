@@ -1,5 +1,5 @@
 #!/bin/bash
-if [[ -f openvpn*.zip ]]; then
+if [ -f openvpn*.zip ]; then
     unzip -q openvpn*.zip
 
     rm --force openvpn*.zip
