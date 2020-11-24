@@ -55,6 +55,7 @@ exec $(which openvpn) \
     --setenv PIA_HOSTNAME ${region_hostname} \
     --setenv PIA_TOKEN ${token} \
     --setenv LOCAL_NETWORK ${LOCAL_NETWORK} \
+    --setenv TRANSMISSION_PORT ${TRANSMISSION_PORT} \
     --setenv TRANSMISSION_ALLOWED ${TRANSMISSION_ALLOWED} \
     --script-security 2 \
     --log /var/log/openvpn.log
