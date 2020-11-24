@@ -4,6 +4,7 @@ $(which transmission-daemon) \
     --incomplete-dir /data/incomplete \
     --logfile /var/log/transmisson-daemon.log \
     --config-dir /config \
+    --port ${TRANSMISSION_PORT}
     --download-dir /data/complete \
     --no-portmap
 

@@ -1,34 +1,34 @@
 #!/bin/bash
-if [ ${OPENVPN_CAN_FORWARD} == true ]; then
-    while true; do
-        while ! curl --silent localhost:9091 > /dev/null; do
-            sleep $((sleepa += 1))
-        done
+while true; do
+  while ! curl --silent localhost:${TRANSMISSION_PORT} > /dev/null; do
+    sleep $((sleepa += 1))
+  done
 
-        if [ -f /config/client_id.txt ]; then
-            client_id=$(cat /config/client_id.txt)
-        else
-            client_id=$(head -100 /dev/urandom | md5sum | tr --delete ' -')
-            echo ${client_id} > /config/client_id.txt
-        fi
+  while true; do
+    payload_and_signature=$(curl -s -m 5 --connect-to "${PIA_HOSTNAME}::${route_vpn_gateway}:" --insecure -G --data-urlencode "token=${PIA_TOKEN}" "https://${PIA_HOSTNAME}:19999/getSignature")
 
-        mapfile -n 2 -t credentials < /etc/openvpn/credentials.txt
-        local_ip=$(ip address show tun0 | egrep --only-matching 'inet\s*([0-9]{1,3}\.?){4}' | tr --delete 'a-z ')
-        data="user=${credentials[0]}&pass=${credentials[1]}&client_id=${client_id}&local_ip=${local_ip}"
+    if [[ ${payload_and_signature} && $(jq -r '.status' <<< ${payload_and_signature}) == OK ]]; then
+      signature=$(jq -r '.signature' <<< ${payload_and_signature})
+      payload64=$(jq -r '.payload' <<< ${payload_and_signature})
+      payload=$(base64 -d <<< ${payload64})
+      port=$(jq -r '.port' <<< ${payload})
+      expires_at=$(jq -r '.expires_at' <<< ${payload})
+      break
+    fi
 
-        while true; do
-            port=$(curl --silent --location --data ${data} "https://www.privateinternetaccess.com/vpninfo/port_forward_assignment" | jq --raw-output '.port')
+    sleep $((sleepb += 5))
+  done
 
-            if egrep --silent '^[0-9]+$' <<< ${port}; then
-                $(which transmission-remote) --port ${port}
-                break
-            fi
+  while true; do
+    [[ $(date -d ${expires_at} +%s) -lt $(date +%s) ]] && break
 
-            sleep $((sleepb += 5))
-        done
+    bind_port_response=$(curl -Gs -m 5 --connect-to "${PIA_HOSTNAME}::${route_vpn_gateway}:" --insecure --data-urlencode "payload=${payload64}" --data-urlencode "signature=${signature}" "https://${PIA_HOSTNAME}:19999/bindPort")
 
-        min=$((60 * 60 * ${TRANSMISSION_MIN_PORT_HRS}))
-        max=$((60 * 60 * ${TRANSMISSION_MAX_PORT_HRS}))
-        sleep $((RANDOM % (${max} - ${min} + 1) + ${min}))
-    done
-fi
+    if [[ ${bind_port_response} && $(jq -r '.status' <<< ${bind_port_response}) == OK ]]; then
+      $(which transmission-remote) --port ${port}
+      sleep 900
+    fi
+
+    sleep $((sleepc += 5))
+  done
+done

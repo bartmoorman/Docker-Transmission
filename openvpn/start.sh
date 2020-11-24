@@ -1,15 +1,5 @@
 #!/bin/bash
-# https://www.privateinternetaccess.com/pages/client-support/#eighth
-
-# Temporarily remove Canada
-# https://www.privateinternetaccess.com/helpdesk/news/posts/march-31-2020-port-forwarding-issues
-# gateways=(ca_toronto ca_montreal ca_vancouver de_berlin de_frankfurt france czech_republic spain romania israel)
-gateways=(de_berlin de_frankfurt france czech_republic spain romania israel)
-
-echo "${OPENVPN_USERNAME}" > credentials.txt
-echo "${OPENVPN_PASSWORD}" >> credentials.txt
-
-if [ -f openvpn*.zip ]; then
+if [[ -f openvpn*.zip ]]; then
     unzip -q openvpn*.zip
 
     rm --force openvpn*.zip
@@ -19,31 +9,42 @@ if [ -f openvpn*.zip ]; then
     *.ovpn
 fi
 
-if [[ "${OPENVPN_GATEWAY}" =~ ^[Aa]uto ]]; then
-    remotes=$(sed --regexp-extended --silent 's/^remote\s+(.*)\s+[0-9]+$/\1/p' "${gateways[@]/%/.ovpn}")
+serverlist_url='https://serverlist.piaservers.net/vpninfo/servers/v4'
 
-    while true; do
-        selected=$(netselect ${remotes} | awk '{print $2}' | sed 's/\./\\\./g')
+while true; do
+  all_region_data=$(curl -s "$serverlist_url" | head -1)
+  viable_regions=$(jq -r '.regions[] | select(.port_forward==true) | .servers.meta[0].ip' <<< ${all_region_data})
+  best_region=$(netselect ${viable_regions} | awk '{print $2}')
 
-        if [ -n "${selected}" ]; then
-            export OPENVPN_GATEWAY=$(egrep --files-with-matches "^remote\s+${selected}\s+[0-9]+$" "${gateways[@]/%/.ovpn}" | cut --delimiter . --fields 1)
-            export OPENVPN_CAN_FORWARD=true
-            break
-        fi
+  if [[ ${best_region} ]]; then
+    region_data=$(jq --arg META ${best_region} -r '.regions[] | select(.servers.meta[0].ip==$META)' <<< ${all_region_data})
+    region_dns=$(jq -r '.dns' <<< ${region_data})
+    region_ip=$(jq -r '.servers.ovpnudp[0].ip' <<< ${region_data})
+    region_hostname=$(jq -r '.servers.ovpnudp[0].cn' <<< ${region_data})
+    region_meta_ip=$(jq -r '.servers.meta[0].ip' <<< ${region_data})
+    region_meta_hostname=$(jq -r '.servers.meta[0].cn' <<< ${region_data})
+    gateway=$(egrep --files-with-matches "^remote\s+${region_dns}\s+[0-9]+$" *.ovpn)
+    break
+  fi
 
-        sleep $((sleep += 5))
-    done
-else
-    for gateway in "${gateways[@]}"; do
-        if [ "${gateway}" == "${OPENVPN_GATEWAY}" ]; then
-            export OPENVPN_CAN_FORWARD=true
-            break
-        fi
-    done
-fi
+  sleep $((sleepa += 5))
+done
+
+while true; do
+  generate_token_response=$(curl -s -u "${PIA_USER}:${PIA_PASS}" --connect-to "${region_meta_hostname}::${region_meta_ip}:" --insecure "https://${region_meta_hostname}/authv3/generateToken")
+
+  if [[ ${generate_token_response} && $(jq -r '.status' <<< ${generate_token_response}) == OK ]]; then
+    token=$(jq -r '.token' <<< ${generate_token_response})
+    echo ${token:0:62} > credentials.txt
+    echo ${token:62} >> credentials.txt
+    break
+  fi
+
+  sleep $((sleepb += 5))
+done
 
 exec $(which openvpn) \
-    --config "${OPENVPN_GATEWAY}.ovpn" \
+    --config "${gateway}" \
     --route-up route.sh \
     --ping-exit 60 \
     --ping 10 \
@@ -51,10 +52,9 @@ exec $(which openvpn) \
     --up-delay \
     --down /etc/transmission/stop.sh \
     --down-pre \
-    --setenv OPENVPN_LOCAL_NETWORK ${OPENVPN_LOCAL_NETWORK} \
-    --setenv OPENVPN_CAN_FORWARD ${OPENVPN_CAN_FORWARD:-false} \
+    --setenv PIA_HOSTNAME ${region_hostname} \
+    --setenv PIA_TOKEN ${token} \
+    --setenv LOCAL_NETWORK ${LOCAL_NETWORK} \
     --setenv TRANSMISSION_ALLOWED ${TRANSMISSION_ALLOWED} \
-    --setenv TRANSMISSION_MIN_PORT_HRS ${TRANSMISSION_MIN_PORT_HRS} \
-    --setenv TRANSMISSION_MAX_PORT_HRS ${TRANSMISSION_MAX_PORT_HRS} \
     --script-security 2 \
     --log /var/log/openvpn.log
