@@ -13,7 +13,7 @@ serverlist_url='https://serverlist.piaservers.net/vpninfo/servers/v4'
 
 while true; do
   all_region_data=$(curl -s "$serverlist_url" | head -1)
-  viable_regions=$(jq -r '.regions[] | select(.port_forward==true) | .servers.meta[0].ip' <<< ${all_region_data})
+  viable_regions=$(jq -r '.regions[] | select(.port_forward == true and .geo == false) | .servers.meta[0].ip' <<< ${all_region_data})
   best_region=$(netselect ${viable_regions} | awk '{print $2}')
 
   if [[ ${best_region} ]]; then
