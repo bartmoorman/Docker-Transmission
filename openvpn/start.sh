@@ -17,7 +17,7 @@ while true; do
   best_region=$(netselect ${viable_regions} | awk '{print $2}')
 
   if [[ ${best_region} ]]; then
-    region_data=$(jq --arg META ${best_region} --raw-output '.regions[] | select(.servers.meta[0].ip==$META)' <<< ${all_region_data})
+    region_data=$(jq --raw-output --arg META ${best_region} '.regions[] | select(.servers.meta[0].ip == $META)' <<< ${all_region_data})
     region_dns=$(jq --raw-output '.dns' <<< ${region_data})
     region_ip=$(jq --raw-output '.servers.ovpnudp[0].ip' <<< ${region_data})
     region_hostname=$(jq --raw-output '.servers.ovpnudp[0].cn' <<< ${region_data})
