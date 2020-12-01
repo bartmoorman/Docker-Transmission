@@ -12,17 +12,17 @@ fi
 serverlist_url='https://serverlist.piaservers.net/vpninfo/servers/v4'
 
 while true; do
-  all_region_data=$(curl -s "$serverlist_url" | head -1)
-  viable_regions=$(jq -r '.regions[] | select(.port_forward == true and .geo == false) | .servers.meta[0].ip' <<< ${all_region_data})
+  all_region_data=$(curl --silent "$serverlist_url" | head -1)
+  viable_regions=$(jq --raw-output '.regions[] | select(.port_forward == true and .geo == false) | .servers.meta[0].ip' <<< ${all_region_data})
   best_region=$(netselect ${viable_regions} | awk '{print $2}')
 
   if [[ ${best_region} ]]; then
-    region_data=$(jq --arg META ${best_region} -r '.regions[] | select(.servers.meta[0].ip==$META)' <<< ${all_region_data})
-    region_dns=$(jq -r '.dns' <<< ${region_data})
-    region_ip=$(jq -r '.servers.ovpnudp[0].ip' <<< ${region_data})
-    region_hostname=$(jq -r '.servers.ovpnudp[0].cn' <<< ${region_data})
-    region_meta_ip=$(jq -r '.servers.meta[0].ip' <<< ${region_data})
-    region_meta_hostname=$(jq -r '.servers.meta[0].cn' <<< ${region_data})
+    region_data=$(jq --arg META ${best_region} --raw-output '.regions[] | select(.servers.meta[0].ip==$META)' <<< ${all_region_data})
+    region_dns=$(jq --raw-output '.dns' <<< ${region_data})
+    region_ip=$(jq --raw-output '.servers.ovpnudp[0].ip' <<< ${region_data})
+    region_hostname=$(jq --raw-output '.servers.ovpnudp[0].cn' <<< ${region_data})
+    region_meta_ip=$(jq --raw-output '.servers.meta[0].ip' <<< ${region_data})
+    region_meta_hostname=$(jq --raw-output '.servers.meta[0].cn' <<< ${region_data})
     gateway=$(egrep --files-with-matches "^remote\s+${region_dns}\s+[0-9]+$" *.ovpn)
     break
   fi
@@ -31,10 +31,10 @@ while true; do
 done
 
 while true; do
-  generate_token_response=$(curl -s -u "${PIA_USER}:${PIA_PASS}" --connect-to "${region_meta_hostname}::${region_meta_ip}:" --insecure "https://${region_meta_hostname}/authv3/generateToken")
+  generate_token_response=$(curl --connect-to "${region_meta_hostname}::${region_meta_ip}:" --max-time 5 --silent --user "${PIA_USER}:${PIA_PASS}" "https://${region_meta_hostname}/authv3/generateToken")
 
-  if [[ ${generate_token_response} && $(jq -r '.status' <<< ${generate_token_response}) == OK ]]; then
-    token=$(jq -r '.token' <<< ${generate_token_response})
+  if [[ ${generate_token_response} && $(jq --raw-output '.status' <<< ${generate_token_response}) == OK ]]; then
+    token=$(jq --raw-output '.token' <<< ${generate_token_response})
     echo ${token:0:62} > credentials.txt
     echo ${token:62} >> credentials.txt
     break

@@ -29,12 +29,12 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' > 
     wget \
  && wget --quiet --directory-prefix /tmp "http://ftp.debian.org/debian/pool/main/n/netselect/netselect_0.3.ds1-28+b1_amd64.deb" \
  && dpkg --install /tmp/netselect_*_amd64.deb \
+ && wget --quiet --directory-prefix /usr/local/share/ca-certificates "https://raw.githubusercontent.com/pia-foss/manual-connections/master/ca.rsa.4096.crt" \
+ && update-ca-certificates \
+ && wget --quiet --directory-prefix /etc/openvpn "https://www.privateinternetaccess.com/openvpn/openvpn.zip" \
  && apt-get autoremove --yes --purge \
  && apt-get clean \
  && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ADD https://www.privateinternetaccess.com/openvpn/openvpn.zip /etc/openvpn/
-#ADD https://www.privateinternetaccess.com/openvpn/openvpn-strong.zip /etc/openvpn/
 
 COPY openvpn/ /etc/openvpn/
 COPY transmission/ /etc/transmission/
