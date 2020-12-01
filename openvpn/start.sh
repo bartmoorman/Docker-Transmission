@@ -31,7 +31,13 @@ while true; do
 done
 
 while true; do
-  generate_token_response=$(curl --connect-to "${region_meta_hostname}::${region_meta_ip}:" --max-time 5 --silent --user "${PIA_USER}:${PIA_PASS}" "https://${region_meta_hostname}/authv3/generateToken")
+  generate_token_response=$(curl \
+    --connect-to "${region_meta_hostname}::${region_meta_ip}:" \
+    --max-time 5 \
+    --silent \
+    --user "${PIA_USER}:${PIA_PASS}" \
+    "https://${region_meta_hostname}/authv3/generateToken"
+  )
 
   if [[ ${generate_token_response} && $(jq --raw-output '.status' <<< ${generate_token_response}) == OK ]]; then
     token=$(jq --raw-output '.token' <<< ${generate_token_response})
