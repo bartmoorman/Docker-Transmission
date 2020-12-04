@@ -64,4 +64,4 @@ exec $(which openvpn) \
     --setenv TRANSMISSION_PORT ${TRANSMISSION_PORT} \
     --setenv TRANSMISSION_ALLOWED ${TRANSMISSION_ALLOWED} \
     --script-security 2 \
-    --log /var/log/openvpn.log
+    --log /var/log/openvpn/openvpn.log
