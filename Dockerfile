@@ -1,6 +1,7 @@
-FROM bmoorman/ubuntu:focal
+FROM bmoorman/ubuntu:bionic
 
-ARG DEBIAN_FRONTEND="noninteractive"
+ARG DEBIAN_FRONTEND=noninteractive \
+    TARGETPLATFORM
 
 ENV PIA_USER="**username**" \
     PIA_PASS="**password**" \
@@ -10,14 +11,14 @@ ENV PIA_USER="**username**" \
 
 WORKDIR /etc/openvpn
 
-RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu focal main' > /etc/apt/sources.list.d/transmission.list \
- && echo 'deb-src http://ppa.launchpad.net/transmissionbt/ppa/ubuntu focal main' >> /etc/apt/sources.list.d/transmission.list \
+RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' > /etc/apt/sources.list.d/transmission.list \
+ && echo 'deb-src http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' >> /etc/apt/sources.list.d/transmission.list \
  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 976B5901365C5CA1 \
- && echo 'deb https://ookla.bintray.com/debian generic main' > /etc/apt/sources.list.d/speedtest.list \
- && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61 \
+ && echo 'deb https://packagecloud.io/ookla/speedtest-cli/ubuntu/ bionic main' > /etc/apt/sources.list.d/ookla_speedtest-cli.list \
+ && echo 'deb-src https://packagecloud.io/ookla/speedtest-cli/ubuntu/ bionic main' >> /etc/apt/sources.list.d/ookla_speedtest-cli.list \
+ && curl --silent --location "https://packagecloud.io/ookla/speedtest-cli/gpgkey" | apt-key add \
  && apt-get update \
  && apt-get install --yes --no-install-recommends \
-    curl \
     jq \
     openssh-client \
     openvpn \
@@ -27,8 +28,6 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu focal main' > /
     unrar \
     unzip \
     wget \
- && wget --quiet --directory-prefix /tmp "http://ftp.debian.org/debian/pool/main/n/netselect/netselect_0.3.ds1-28+b1_amd64.deb" \
- && dpkg --install /tmp/netselect_*_amd64.deb \
  && wget --quiet --directory-prefix /usr/local/share/ca-certificates "https://raw.githubusercontent.com/pia-foss/manual-connections/master/ca.rsa.4096.crt" \
  && update-ca-certificates \
  && wget --quiet --directory-prefix /etc/openvpn "https://www.privateinternetaccess.com/openvpn/openvpn.zip" \
@@ -36,6 +35,7 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu focal main' > /
  && apt-get clean \
  && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+COPY ${TARGETPLATFORM}/netselect /usr/local/bin/
 COPY openvpn/ /etc/openvpn/
 COPY transmission/ /etc/transmission/
 
