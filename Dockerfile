@@ -18,6 +18,7 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu focal main' > /
     transmission-cli \
     transmission-daemon \
     unrar \
+    unzip \
  && apt-get autoremove --yes --purge \
  && apt-get clean \
  && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
