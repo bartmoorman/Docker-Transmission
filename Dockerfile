@@ -13,12 +13,9 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu focal main' > /
  && curl --silent --location "https://packagecloud.io/ookla/speedtest-cli/gpgkey" | apt-key add \
  && apt-get update \
  && apt-get install --yes --no-install-recommends \
-    openssh-client \
     speedtest \
     transmission-cli \
     transmission-daemon \
-    unrar \
-    unzip \
  && apt-get autoremove --yes --purge \
  && apt-get clean \
  && rm --recursive --force /var/lib/apt/lists/* /tmp/* /var/tmp/*
