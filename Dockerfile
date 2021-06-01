@@ -20,12 +20,10 @@ RUN echo 'deb http://ppa.launchpad.net/transmissionbt/ppa/ubuntu bionic main' > 
  && apt-get update \
  && apt-get install --yes --no-install-recommends \
     jq \
-    openssh-client \
     openvpn \
     speedtest \
     transmission-cli \
     transmission-daemon \
-    unrar \
     unzip \
     wget \
  && wget --quiet --directory-prefix /usr/local/share/ca-certificates "https://raw.githubusercontent.com/pia-foss/manual-connections/master/ca.rsa.4096.crt" \
