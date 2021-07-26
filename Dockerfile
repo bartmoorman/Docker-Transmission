@@ -1,7 +1,7 @@
 FROM bmoorman/ubuntu:focal
 
 ARG DEBIAN_FRONTEND=noninteractive \
-    TARGETPLATFORM
+    TARGETPLATFORM=linux/amd64
 
 ENV PIA_USER="**username**" \
     PIA_PASS="**password**" \
