@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 while true; do
   while ! curl --silent localhost:${TRANSMISSION_PORT} > /dev/null; do
+    echo "transmission/port ($(date)): Waiting for Transmission to be ready"
     sleep $((sleepa += 1))
   done
 
   while true; do
+    echo "transmission/port ($(date)): Getting signature and payload"
     payload_and_signature=$(curl \
       --connect-to "${PIA_HOSTNAME}::${route_vpn_gateway}:" \
       --data-urlencode "token=${PIA_TOKEN}" \
@@ -20,6 +22,7 @@ while true; do
       payload=$(base64 --decode <<< ${payload64})
       port=$(jq --raw-output '.port' <<< ${payload})
       expires_at=$(jq --raw-output '.expires_at' <<< ${payload})
+      echo "transmission/port ($(date)): Port is ${port} and expires at ${expires_at}"
       break
     fi
 
@@ -29,6 +32,7 @@ while true; do
   while true; do
     [[ $(date --date ${expires_at} +%s) -lt $(date +%s) ]] && break
 
+    echo "transmission/port ($(date)): Binding port"
     bind_port_response=$(curl \
       --connect-to "${PIA_HOSTNAME}::${route_vpn_gateway}:" \
       --data-urlencode "payload=${payload64}" \
@@ -40,6 +44,7 @@ while true; do
     )
 
     if [[ ${bind_port_response} && $(jq --raw-output '.status' <<< ${bind_port_response}) == OK ]]; then
+      echo "transmission/port ($(date)): Setting Transmission port"
       $(which transmission-remote) --port ${port}
       sleep 900
     fi
