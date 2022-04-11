@@ -47,7 +47,7 @@ while true; do
     token=$(jq --raw-output '.token' <<< ${generate_token_response})
     echo ${token:0:62} > credentials.txt
     echo ${token:62} >> credentials.txt
-    echo 'openvpn/start ($(date)): Token generated'
+    echo "openvpn/start ($(date)): Token generated"
     break
   fi
 
